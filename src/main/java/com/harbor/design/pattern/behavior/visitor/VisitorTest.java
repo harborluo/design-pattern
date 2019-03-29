@@ -3,7 +3,8 @@ package com.harbor.design.pattern.behavior.visitor;
 /**
  * Created by HLuo on 3/29/2019.
  */
-public class VisitorDemo {
+public class VisitorTest {
+    /*
     // 银行柜台服务，以后银行要新增业务，只需要新增一个类实现这个接口就可以了。
     interface Service {
 
@@ -58,13 +59,15 @@ public class VisitorDemo {
 
         }
     }
-
+*/
     public static void main(String[] args) {
         Service saving = new Saving();
         Service fund = new Fund();
         Service draw = new Draw();
+
         Visitor visitor = new Visitor();
         Visitor guweiwei = new Visitor();
+
         fund.accept(guweiwei);
         saving.accept(visitor);
         fund.accept(visitor);
