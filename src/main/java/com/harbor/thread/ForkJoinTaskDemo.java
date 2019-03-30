@@ -122,8 +122,7 @@ public class ForkJoinTaskDemo {
         @Override
         protected void compute() {
 
-            System.out.println(Thread.currentThread().getName() + " computing");
-
+//            System.out.println(Thread.currentThread().getName() + " computing");
 
             if ((end - start) <= THRESHOLD) {
                 mergeSort(data, tmp, start, end);
