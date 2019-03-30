@@ -8,16 +8,16 @@ import java.util.concurrent.TimeUnit;
 
 public class ForkJoinTaskDemo {
     public static void main(String[] args) throws InterruptedException {
-        int length = 8;
-        int[] data = {9,8,7,6,5,4,3,2};//(new Data(length)).getData();
+        int length = 10;
+        int[] data = (new Data(length)).getData();
         printArr(data);
         System.out.println("----------------");
 
-        int[] tmp = new int[data.length];
+        int[] result = new int[data.length];
 
         //Fork/Join 从这里开始
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        ForkJoinTaskDemo.mergeTask task = new ForkJoinTaskDemo.mergeTask(data, tmp, 0, data.length - 1);//创建任务
+        ForkJoinTaskDemo.mergeTask task = new ForkJoinTaskDemo.mergeTask(data, result, 0, data.length - 1);//创建任务
         forkJoinPool.execute(task);//执行任务
         forkJoinPool.awaitTermination(2, TimeUnit.SECONDS);//阻塞当前线程直到pool中的任务都完成了
 
@@ -27,7 +27,13 @@ public class ForkJoinTaskDemo {
 
     }
 
-    //递归
+    /**
+     *
+     * @param nums
+     * @param tmp
+     * @param left
+     * @param right
+     */
     private static void mergeSort(int[] nums, int[] tmp, int left, int right) {
         if (left < right) {
             int center = (left + right) / 2;
@@ -37,7 +43,14 @@ public class ForkJoinTaskDemo {
         }
     }
 
-    //合并
+    /**
+     *
+     * @param data
+     * @param result
+     * @param leftPos
+     * @param rightPos
+     * @param rightEnd
+     */
     private static void merge(int[] data, int[] result, int leftPos, int rightPos, int rightEnd) {
         int leftEnd = rightPos - 1;
         int tmpPos = leftPos;
@@ -45,10 +58,13 @@ public class ForkJoinTaskDemo {
 
         while (leftPos <= leftEnd && rightPos <= rightEnd) {
             if (data[leftPos] < data[rightPos]) {
-                result[tmpPos++] = data[leftPos++];
+                result[tmpPos] = data[leftPos];
+                leftPos++;
             } else {
-                result[tmpPos++] = data[rightPos++];
+                result[tmpPos] = data[rightPos];
+                rightPos++;
             }
+            tmpPos++;
         }
 
         while (leftPos <= leftEnd) {
@@ -62,12 +78,10 @@ public class ForkJoinTaskDemo {
         for (int i = 0; i < numElements; i++, rightEnd--) {
             data[rightEnd] = result[rightEnd];
         }
-        System.out.println(Thread.currentThread().getName() + " merge left = "+leftPos+", right = "+rightPos+", rightEnd = "+ rightEnd+", "+ Arrays.toString(result));
-    }
 
-    public static void mergeSort(int[] nums) {
-        int[] tmp = new int[nums.length];
-        mergeSort(nums, tmp, 0, nums.length - 1);
+        System.out.println(Thread.currentThread().getName() + " merge left = "+leftPos+", right = "+rightPos+", rightEnd = "+ rightEnd);
+        System.out.println(Thread.currentThread().getName() + " data   ==> " + Arrays.toString(data));
+        System.out.println(Thread.currentThread().getName() + " result ==> " + Arrays.toString(result));
     }
 
     //打印
@@ -98,7 +112,7 @@ public class ForkJoinTaskDemo {
         private int[] tmp;
 
         public mergeTask(int[] data, int[] tmp, int start, int end) {
-            System.out.println(Thread.currentThread().getName() + " Creating sub task....");
+            System.out.println(Thread.currentThread().getName() + " Creating sub task with start = "+start+", end = "+end);
             this.data = data;
             this.tmp = tmp;
             this.start = start;
