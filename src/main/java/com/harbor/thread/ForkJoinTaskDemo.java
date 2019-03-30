@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 public class ForkJoinTaskDemo {
     public static void main(String[] args) throws InterruptedException {
         int length = 8;
-        int[] data = (new Data(length)).getData();
+        int[] data = {9,8,7,6,5,4,3,2};//(new Data(length)).getData();
         printArr(data);
         System.out.println("----------------");
 
@@ -38,27 +38,31 @@ public class ForkJoinTaskDemo {
     }
 
     //合并
-    private static void merge(int[] nums, int[] tmp, int leftPos, int rightPos, int rightEnd) {
+    private static void merge(int[] data, int[] result, int leftPos, int rightPos, int rightEnd) {
         int leftEnd = rightPos - 1;
         int tmpPos = leftPos;
         int numElements = rightEnd - leftPos + 1;
 
         while (leftPos <= leftEnd && rightPos <= rightEnd) {
-            if (nums[leftPos] < nums[rightPos])
-                tmp[tmpPos++] = nums[leftPos++];
-            else
-                tmp[tmpPos++] = nums[rightPos++];
+            if (data[leftPos] < data[rightPos]) {
+                result[tmpPos++] = data[leftPos++];
+            } else {
+                result[tmpPos++] = data[rightPos++];
+            }
         }
 
-        while (leftPos <= leftEnd)
-            tmp[tmpPos++] = nums[leftPos++];
+        while (leftPos <= leftEnd) {
+            result[tmpPos++] = data[leftPos++];
+        }
 
-        while (rightPos <= rightEnd)
-            tmp[tmpPos++] = nums[rightPos++];
+        while (rightPos <= rightEnd) {
+            result[tmpPos++] = data[rightPos++];
+        }
 
-        for (int i = 0; i < numElements; i++, rightEnd--)
-            nums[rightEnd] = tmp[rightEnd];
-        System.out.println(Thread.currentThread().getName() + " merge " + Arrays.toString(tmp));
+        for (int i = 0; i < numElements; i++, rightEnd--) {
+            data[rightEnd] = result[rightEnd];
+        }
+        System.out.println(Thread.currentThread().getName() + " merge left = "+leftPos+", right = "+rightPos+", rightEnd = "+ rightEnd+", "+ Arrays.toString(result));
     }
 
     public static void mergeSort(int[] nums) {
@@ -68,9 +72,10 @@ public class ForkJoinTaskDemo {
 
     //打印
     public static void printArr(int[] arr) {
-        for (int i : arr) {
-            System.out.println(i + " ");
-        }
+//        for (int i : arr) {
+//            System.out.println(i + " ");
+//        }
+        System.out.println(Arrays.toString(arr));
     }
 
     public static void verify(int[] nums) {
