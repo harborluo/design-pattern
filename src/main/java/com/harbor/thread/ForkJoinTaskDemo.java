@@ -2,16 +2,27 @@ package com.harbor.thread;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.TimeUnit;
 
 public class ForkJoinTaskDemo {
+
+    private  static CountDownLatch lock = null;
+
     public static void main(String[] args) throws InterruptedException {
-        int length = 10;
+        int length = 20;
         int[] data = (new Data(length)).getData();
+
+//        data = new int[]{1,2,3,4,5,6,7,8,9,10};
+
         printArr(data);
         System.out.println("----------------");
+
+        int taskCunt = calcTaskCount(length - 1);
+
+        lock = new CountDownLatch(taskCunt );
 
         int[] result = new int[data.length];
 
@@ -19,11 +30,44 @@ public class ForkJoinTaskDemo {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         ForkJoinTaskDemo.mergeTask task = new ForkJoinTaskDemo.mergeTask(data, result, 0, data.length - 1);//创建任务
         forkJoinPool.execute(task);//执行任务
-        forkJoinPool.awaitTermination(2, TimeUnit.SECONDS);//阻塞当前线程直到pool中的任务都完成了
+
+//        forkJoinPool.awaitTermination(2, TimeUnit.SECONDS);//阻塞当前线程直到pool中的任务都完成了
+        lock.await();
 
         printArr(data);
         System.out.println();
         verify(data);
+
+    }
+
+    private static int calcTaskCount(int length) {
+        //return 7;
+        count = 0;
+
+         calcCount(0, length);
+
+//        return 7;
+        return count;
+    }
+
+    private static Integer count =0;
+
+    private static void calcCount(int start, int end) {
+
+        int center = (start + end) / 2;
+
+        if ((end - start) <= 2) {
+
+        } else {
+            //left
+            calcCount(start, center);
+            //right
+            calcCount(center + 1, end);
+        }
+
+//        synchronized (count) {
+            count++;
+//        }
 
     }
 
@@ -79,9 +123,10 @@ public class ForkJoinTaskDemo {
             data[rightEnd] = result[rightEnd];
         }
 
-        System.out.println(Thread.currentThread().getName() + " merge left = "+leftPos+", right = "+rightPos+", rightEnd = "+ rightEnd);
-        System.out.println(Thread.currentThread().getName() + " data   ==> " + Arrays.toString(data));
-        System.out.println(Thread.currentThread().getName() + " result ==> " + Arrays.toString(result));
+//        System.out.println(Thread.currentThread().getName() + " merge left = "+leftPos+", right = "+rightPos+", rightEnd = "+ rightEnd);
+//        System.out.println(Thread.currentThread().getName() + " data   ==> " + Arrays.toString(data));
+//        System.out.println(Thread.currentThread().getName() + " result ==> " + Arrays.toString(result));
+//        lock.countDown();
     }
 
     //打印
@@ -112,7 +157,7 @@ public class ForkJoinTaskDemo {
         private int[] tmp;
 
         public mergeTask(int[] data, int[] tmp, int start, int end) {
-            System.out.println(Thread.currentThread().getName() + " Creating sub task with start = "+start+", end = "+end);
+//            System.out.println(Thread.currentThread().getName() + " Creating sub task with start = "+start+", end = "+end);
             this.data = data;
             this.tmp = tmp;
             this.start = start;
@@ -140,6 +185,9 @@ public class ForkJoinTaskDemo {
                 merge(data, tmp, start, center + 1, end);
 
             }
+
+            lock.countDown();
+
         }
     }
 
