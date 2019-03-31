@@ -12,7 +12,7 @@ public class ForkJoinTaskDemo {
     private  static CountDownLatch lock = null;
 
     public static void main(String[] args) throws InterruptedException {
-        int length = 20;
+        int length = 10;
         int[] data = (new Data(length)).getData();
 
 //        data = new int[]{1,2,3,4,5,6,7,8,9,10};
@@ -23,6 +23,8 @@ public class ForkJoinTaskDemo {
         int taskCunt = calcTaskCount(length - 1);
 
         lock = new CountDownLatch(taskCunt );
+
+        System.out.println("total task count is: " + taskCunt);
 
         int[] result = new int[data.length];
 
@@ -35,7 +37,7 @@ public class ForkJoinTaskDemo {
         lock.await();
 
         printArr(data);
-        System.out.println();
+        System.out.println("---------------------");
         verify(data);
 
     }
@@ -123,10 +125,9 @@ public class ForkJoinTaskDemo {
             data[rightEnd] = result[rightEnd];
         }
 
-//        System.out.println(Thread.currentThread().getName() + " merge left = "+leftPos+", right = "+rightPos+", rightEnd = "+ rightEnd);
-//        System.out.println(Thread.currentThread().getName() + " data   ==> " + Arrays.toString(data));
-//        System.out.println(Thread.currentThread().getName() + " result ==> " + Arrays.toString(result));
-//        lock.countDown();
+        System.out.println(Thread.currentThread().getName() + " merge left = "+leftPos+", right = "+rightPos+", rightEnd = "+ rightEnd);
+        System.out.println(Thread.currentThread().getName() + " data   ==> " + Arrays.toString(data));
+        System.out.println(Thread.currentThread().getName() + " result ==> " + Arrays.toString(result));
     }
 
     //打印
